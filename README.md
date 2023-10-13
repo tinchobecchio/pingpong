@@ -1,6 +1,6 @@
-# pingpong
+# Ping Pong
 Juego ping pong multijugador creado con sockets
 
-# Deploy
-En glitch:
+## Jugar
+Acceder a esta direccion:
 https://pingpong-becchio.glitch.me/
