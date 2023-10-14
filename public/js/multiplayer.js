@@ -1,12 +1,14 @@
 // Canvas Related
+const { body } = document;
 const canvas = document.createElement("canvas");
 const context = canvas.getContext("2d");
+const gameOverEl = document.createElement("div");
 const socket = io("/pong");
 let isReferee = false;
 let paddleIndex = 0;
 
 let width = 500;
-let height = 700;
+let height = 600;
 
 // Paddle
 let paddleHeight = 10;
@@ -18,7 +20,7 @@ let playerMoved = false;
 
 // Ball
 let ballX = 250;
-let ballY = 350;
+let ballY = 300;
 let ballRadius = 5;
 let ballDirection = 1;
 
@@ -68,8 +70,8 @@ function renderCanvas() {
   // Dashed Center Line
   context.beginPath();
   context.setLineDash([4]);
-  context.moveTo(0, 350);
-  context.lineTo(500, 350);
+  context.moveTo(0, 300);
+  context.lineTo(500, 300);
   context.strokeStyle = "grey";
   context.stroke();
 
@@ -163,6 +165,36 @@ function ballBoundaries() {
   }
 }
 
+function showGameOverEl(paddleWinner) {
+  // Hide Canvas
+  canvas.hidden = true;
+  // Container
+  gameOverEl.textContent = "";
+  gameOverEl.classList.add("game-over-container");
+  // Title
+  const title = document.createElement("h1");
+  if (paddleWinner === paddleIndex) {
+    title.textContent = `You Win!`;
+  } else {
+    title.textContent = `You Lose!`;
+  }
+
+  // Button Home
+  const homeBtn = document.createElement("button");
+  homeBtn.setAttribute("onclick", "location = '/'");
+  homeBtn.textContent = "Home";
+
+  // btn-container
+  const btnContainer = document.createElement("div");
+  btnContainer.textContent = "";
+  btnContainer.classList.add("btn-container");
+
+  // Append
+  btnContainer.append(homeBtn);
+  gameOverEl.append(title, btnContainer);
+  body.appendChild(gameOverEl);
+}
+
 // Called Every Frame
 function animate() {
   if (isReferee) {
@@ -223,4 +255,8 @@ socket.on("paddleMove", (paddleData) => {
 
 socket.on("ballMove", (ballData) => {
   ({ ballX, ballY, score } = ballData); // extrae los valores y los asigna a las variables que ya existian
+});
+
+socket.on("gameOver", (paddleWinner) => {
+  showGameOverEl(paddleWinner);
 });

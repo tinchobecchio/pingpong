@@ -4,6 +4,7 @@ function listen(io) {
   const pongNamespace = io.of("/pong");
   pongNamespace.on("connection", (socket) => {
     let room;
+    const winningScore = 5;
     console.log("A user connected", socket.id);
 
     socket.on("ready", () => {
@@ -25,6 +26,12 @@ function listen(io) {
 
     socket.on("ballMove", (ballData) => {
       socket.to(room).emit("ballMove", ballData); // envia a todos menos al socket que lo emite
+      if (ballData.score.includes(winningScore)) {
+        const paddleWinner = ballData.score.indexOf(winningScore);
+        pongNamespace.in(room).emit("gameOver", paddleWinner);
+        // socket.leave(room);
+        pongNamespace.in(room).disconnectSockets(true);
+      }
     });
 
     socket.on("disconnect", (reason) => {
